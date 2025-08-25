@@ -1,5 +1,7 @@
 import express from "express";
 import customerVolumeUsageRoutes from "./routes/customerVolumeUsageRoutes";
+import rootRoutes from "./routes/rootRoutes";
+
 
 const app = express();
 
@@ -7,9 +9,7 @@ const app = express();
 app.use(express.json());
 
 // Root route
-app.get('/', (req, res) => {
-    res.send('Volume Accounting Service is running!');
-});
+app.use('/', rootRoutes);
 
 // API routes
 app.use('/api', customerVolumeUsageRoutes);
