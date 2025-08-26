@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import app from "./app";
 import { updateRemainingVolume } from "./services/updateRemainingVolume";
-import { migrate } from "./config/migrate";
+import { migrate } from "./config/database/migrate";
 
 dotenv.config();
 

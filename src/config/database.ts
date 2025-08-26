@@ -5,11 +5,11 @@ dotenv.config();
 const { Pool } = pkg;
 
 const pool = new Pool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 5432,
-    database: process.env.DB_DATABASE,
-    user: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
+    host: process.env.DB_PG_HOST,
+    port: process.env.DB_PG_PORT ? parseInt(process.env.DB_PG_PORT, 10) : 5432,
+    database: process.env.DB_PG_DATABASE,
+    user: process.env.DB_PG_USERNAME,
+    password: process.env.DB_PG_PASSWORD,
 });
 
 pool.on('connect', () => {

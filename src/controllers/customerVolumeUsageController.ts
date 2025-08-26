@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getAllUsage, createUsage } from "../models/customerVolumeUsage";
+import { getAllUsage, createUsage } from "../services/customerVolumeUsageService";
 
 
 export const getCustomerVolumeUsages = async (req: Request, res: Response) => {
