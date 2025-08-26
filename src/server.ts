@@ -18,15 +18,3 @@ const startServer = async () => {
 };
 
 startServer();
-
-
-
-/* test route for nodejs without express */
-
-// import http, { IncomingMessage, ServerResponse } from "http";
-
-// http.createServer((request: IncomingMessage, response: ServerResponse) => {
-//     response.writeHead(200, { 'Content-Type': 'text/html' }); // http header
-//     response.write("Hello World");
-//     response.end();
-// }).listen(8080);
