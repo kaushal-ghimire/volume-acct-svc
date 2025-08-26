@@ -25,13 +25,3 @@ export const createCustomerVolumeUsage = async (req: Request, res: Response) => 
         res.status(500).json({ message: 'Error creating customer volume usage' });
     }
 };
-
-// import { Request, Response } from "express";
-
-// export const getCustomerVolumeUsages = (req: Request, res: Response) => {
-//     res.json({ message: "GET customer volume usages" });
-// };
-
-// export const createCustomerVolumeUsage = (req: Request, res: Response) => {
-//     res.json({ message: "POST create customer volume usage" });
-// };
