@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import pgSequelize from "../config/database/pgSequelize";
+import oracleSequelize from "../config/database/oracleSequelize";
 
 class customerVolumeUsage extends Model { }
 customerVolumeUsage.init(
