@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { getAllUsage, createUsage } from "../services/customerVolumeUsageService";
+import { updateDurMinLeft } from "../services/updateDurationLeftService";
 
 
 export const getCustomerVolumeUsages = async (req: Request, res: Response) => {
@@ -18,10 +19,47 @@ export const createCustomerVolumeUsage = async (req: Request, res: Response) => 
         if (!user_name || remaining_volume === undefined) {
             return res.status(400).json({ message: 'user_name and remaining_volume are required' });
         }
+
         const usage = await createUsage({ user_name, remaining_volume });
         res.status(201).json(usage);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error creating customer volume usage' });
+    } catch (error: any) {
+        console.error("Error creating customer volume usage:", error);
+        console.error("Stack trace:", error.stack);
+
+        res.status(500).json({
+            message: 'Error creating customer volume usage',
+            error: error.message,
+            stack: error.stack
+        });
     }
 };
+
+export const updateDurMin = async (req: Request, res: Response) => {
+    try {
+        const { userName, newDurMinLeft } = req.body;
+
+        if (!userName || newDurMinLeft === undefined) {
+            return res.status(400).json({ error: "userName and newDurMinLeft are required" });
+        }
+
+        const result = await updateDurMinLeft(userName, Number(newDurMinLeft));
+        res.json({ message: "Update successful", result });
+    } catch (error: any) {
+        console.error("Error in updateDurMin:", error.message);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// export const createCustomerVolumeUsage = async (req: Request, res: Response) => {
+//     try {
+//         const { user_name, remaining_volume } = req.body;
+//         if (!user_name || remaining_volume === undefined) {
+//             return res.status(400).json({ message: 'user_name and remaining_volume are required' });
+//         }
+//         const usage = await createUsage({ user_name, remaining_volume });
+//         res.status(201).json(usage);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Error creating customer volume usage' });
+//     }
+// };
