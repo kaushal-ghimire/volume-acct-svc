@@ -7,7 +7,7 @@ export const updateDurMinLeft = async (userName: string, newDurMinLeft: number) 
     const t = await oracleSequelize.transaction();
 
     try {
-        // 1. Fetch old value
+        // Fetch old value
         const customer = await CustomerEbill.findOne({
             where: { user_name: userName },
             transaction: t
@@ -19,11 +19,11 @@ export const updateDurMinLeft = async (userName: string, newDurMinLeft: number) 
 
         const oldDurMinLeft = customer.dur_min_left ?? 0;
 
-        // 2. Update customer with new value
+        // Update customer with new value
         customer.dur_min_left = newDurMinLeft;
         await customer.save({ transaction: t });
 
-        // 3. Apply trigger-like logic
+        // Apply trigger-like logic
         if (oldDurMinLeft <= 0 && newDurMinLeft > 0) {
             // Delete from volume_exhausted
             await VolumeExhausted.destroy({

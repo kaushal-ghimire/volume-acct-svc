@@ -49,17 +49,3 @@ export const updateDurMin = async (req: Request, res: Response) => {
         res.status(500).json({ error: error.message });
     }
 };
-
-// export const createCustomerVolumeUsage = async (req: Request, res: Response) => {
-//     try {
-//         const { user_name, remaining_volume } = req.body;
-//         if (!user_name || remaining_volume === undefined) {
-//             return res.status(400).json({ message: 'user_name and remaining_volume are required' });
-//         }
-//         const usage = await createUsage({ user_name, remaining_volume });
-//         res.status(201).json(usage);
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ message: 'Error creating customer volume usage' });
-//     }
-// };

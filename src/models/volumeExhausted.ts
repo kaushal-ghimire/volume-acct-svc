@@ -15,7 +15,7 @@ const VolumeExhausted = oracleSequelize.define("VolumeExhausted", {
     }
 }, {
     tableName: "VOLUME_EXHAUSTED",
-    schema: "EBILL",   // adjust if needed
+    schema: "EBILL",
     timestamps: false
 });
 
