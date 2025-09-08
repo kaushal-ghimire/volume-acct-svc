@@ -3,6 +3,7 @@ import { getAllUsage, createUsage } from "../services/customerVolumeUsageService
 import { updateDurMinLeft } from "../services/updateDurationLeftService";
 
 
+/* without filter */
 // export const getCustomerVolumeUsages = async (req: Request, res: Response) => {
 //     try {
 //         const usages = await getAllUsage();
@@ -29,7 +30,7 @@ import { updateDurMinLeft } from "../services/updateDurationLeftService";
 // };
 
 
-/* using api/volume-usages?username=rohit_home */
+/* using api/volume-usages?username=kaushal_home */
 export const getCustomerVolumeUsages = async (req: Request, res: Response) => {
     try {
         const { username } = req.query;
@@ -67,16 +68,36 @@ export const createCustomerVolumeUsage = async (req: Request, res: Response) => 
 
 export const updateDurMin = async (req: Request, res: Response) => {
     try {
-        const { userName, newDurMinLeft } = req.body;
+        const username = req.query.username as string | undefined; // get from query string
+        const { newDurMinLeft } = req.body;
 
-        if (!userName || newDurMinLeft === undefined) {
-            return res.status(400).json({ error: "userName and newDurMinLeft are required" });
+        if (!username || newDurMinLeft === undefined) {
+            return res.status(400).json({
+                error: "username (query param) and newDurMinLeft (body) are required"
+            });
         }
 
-        const result = await updateDurMinLeft(userName, Number(newDurMinLeft));
-        res.json({ message: "Update successful", result });
+        const result = await updateDurMinLeft(username, Number(newDurMinLeft));
+
+        res.json(result);
     } catch (error: any) {
         console.error("Error in updateDurMin:", error.message);
         res.status(500).json({ error: error.message });
     }
 };
+
+// export const updateDurMin = async (req: Request, res: Response) => {
+//     try {
+//         const { userName, newDurMinLeft } = req.body;
+
+//         if (!userName || newDurMinLeft === undefined) {
+//             return res.status(400).json({ error: "userName and newDurMinLeft are required" });
+//         }
+
+//         const result = await updateDurMinLeft(userName, Number(newDurMinLeft));
+//         res.json({ message: "Update successful", result });
+//     } catch (error: any) {
+//         console.error("Error in updateDurMin:", error.message);
+//         res.status(500).json({ error: error.message });
+//     }
+// };

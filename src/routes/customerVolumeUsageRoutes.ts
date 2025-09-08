@@ -8,8 +8,7 @@ const router = Router();
 
 /* for api/volume-usages?username=rohit_home */
 router.get("/volume-usages", getCustomerVolumeUsages);
-
 router.post("/volume-usages", createCustomerVolumeUsage);
-router.put("/update-customer-rem-dur", updateDurMin);
+router.patch("/volume-duration-remaining", updateDurMin);
 
 export default router;
