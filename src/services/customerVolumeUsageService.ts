@@ -29,9 +29,24 @@ export const createUsage = async ({
     return newUsage.toJSON();
 };
 
-export const getAllUsage = async () => {
+export const getAllUsage = async (username?: string) => {
+    const where: any = {};
+
+    if (username) {
+        where.user_name = username;
+    }
+
     const usages = await customerVolumeUsage.findAll({
+        where,
         order: [["id", "DESC"]],
     });
+
     return usages.map((usage) => usage.toJSON());
 };
+
+// export const getAllUsage = async () => {
+//     const usages = await customerVolumeUsage.findAll({
+//         order: [["id", "DESC"]],
+//     });
+//     return usages.map((usage) => usage.toJSON());
+// };

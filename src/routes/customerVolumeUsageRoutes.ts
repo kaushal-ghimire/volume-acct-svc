@@ -3,8 +3,13 @@ import { getCustomerVolumeUsages, createCustomerVolumeUsage, updateDurMin } from
 
 const router = Router();
 
-router.get("/get-customer-usage", getCustomerVolumeUsages);
-router.post("/create-customer-usage", createCustomerVolumeUsage);
+/* using api/volume-usages/rohit_home */
+// router.get("/volume-usages/:username", getCustomerVolumeUsages);
+
+/* for api/volume-usages?username=rohit_home */
+router.get("/volume-usages", getCustomerVolumeUsages);
+
+router.post("/volume-usages", createCustomerVolumeUsage);
 router.put("/update-customer-rem-dur", updateDurMin);
 
 export default router;

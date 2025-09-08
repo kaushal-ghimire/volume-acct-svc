@@ -3,15 +3,46 @@ import { getAllUsage, createUsage } from "../services/customerVolumeUsageService
 import { updateDurMinLeft } from "../services/updateDurationLeftService";
 
 
+// export const getCustomerVolumeUsages = async (req: Request, res: Response) => {
+//     try {
+//         const usages = await getAllUsage();
+//         res.json(usages);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Error fetching customer volume usage' });
+//     }
+// };
+
+
+/* using api/volume-usages/rohit_home */
+// export const getCustomerVolumeUsages = async (req: Request, res: Response) => {
+//     try {
+//         const { username } = req.params;
+
+//         const usages = await getAllUsage(username);
+
+//         res.json(usages);
+//     } catch (error: any) {
+//         console.error("Error fetching customer volume usage:", error.message);
+//         res.status(500).json({ message: 'Error fetching customer volume usage', error: error.message });
+//     }
+// };
+
+
+/* using api/volume-usages?username=rohit_home */
 export const getCustomerVolumeUsages = async (req: Request, res: Response) => {
     try {
-        const usages = await getAllUsage();
+        const { username } = req.query;
+
+        const usages = await getAllUsage(username as string | undefined);
+
         res.json(usages);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error fetching customer volume usage' });
+    } catch (error: any) {
+        console.error("Error fetching customer volume usage:", error.message, error.stack);
+        res.status(500).json({ message: 'Error fetching customer volume usage', error: error.message });
     }
 };
+
 
 export const createCustomerVolumeUsage = async (req: Request, res: Response) => {
     try {
