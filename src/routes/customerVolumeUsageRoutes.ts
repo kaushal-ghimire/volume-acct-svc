@@ -81,11 +81,25 @@ router.post(
             }),
 
         // validation error handler
+        // (req: Request, res: Response, next: NextFunction) => {
+        //     const errors = validationResult(req);
+        //     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+        //     next();
+        // },
         (req: Request, res: Response, next: NextFunction) => {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+            const errors = validationResult(req).array({ onlyFirstError: true }); // optional, to simplify
+
+            if (errors.length > 0) {
+                return res.status(400).json({
+                    success: false,
+                    errors: errors.map(err => ({
+                        field: (err as any).param ?? (err as any).path ?? "unknown",
+                        message: err.msg
+                    }))
+                });
+            }
             next();
-        },
+        }
     ],
 );
 
