@@ -89,42 +89,6 @@ router.post(
     ],
 );
 
-// router.post(
-//     "/volume-usages",
-//     [
-//         body("user_name")
-//             .notEmpty().withMessage("user_name is required")
-//             .isString().withMessage("user_name must be a string")
-//             .isLength({ min: 3, max: 50 }).withMessage("user_name must be between 3–50 characters")
-//             .custom(async (value) => {
-//                 const existingUser = await customerVolumeUsage.findOne({
-//                     where: { user_name: value },
-//                 });
-//                 if (existingUser) {
-//                     throw new Error("user_name already exists");
-//                 }
-//                 return true;
-//             }),
-
-//         body("remaining_volume")
-//             .notEmpty().withMessage("remaining_volume is required")
-//             .isNumeric().withMessage("remaining_volume must be a number")
-//             .custom(value => {
-//                 if (value < 0) throw new Error("remaining_volume must be >= 0");
-//                 return true;
-//             }),
-
-//         (req: Request, res: Response, next: NextFunction) => {
-//             const errors = validationResult(req);
-//             if (!errors.isEmpty()) {
-//                 return res.status(400).json({ errors: errors.array() });
-//             }
-//             next();
-//         },
-//     ],
-//     createCustomerVolumeUsage
-// );
-
 router.patch("/volume-duration-remaining", updateDurMin);
 
 export default router;

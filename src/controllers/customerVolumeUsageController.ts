@@ -6,33 +6,6 @@ import oracleSequelize from "../config/database/oracleSequelize";
 import { QueryTypes } from "sequelize";
 
 
-/* without filter */
-// export const getCustomerVolumeUsages = async (req: Request, res: Response) => {
-//     try {
-//         const usages = await getAllUsage();
-//         res.json(usages);
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ message: 'Error fetching customer volume usage' });
-//     }
-// };
-
-
-/* using api/volume-usages/rohit_home */
-// export const getCustomerVolumeUsages = async (req: Request, res: Response) => {
-//     try {
-//         const { username } = req.params;
-
-//         const usages = await getAllUsage(username);
-
-//         res.json(usages);
-//     } catch (error: any) {
-//         console.error("Error fetching customer volume usage:", error.message);
-//         res.status(500).json({ message: 'Error fetching customer volume usage', error: error.message });
-//     }
-// };
-
-
 /* using api/volume-usages?username=kaushal_home */
 export const getCustomerVolumeUsages = async (req: Request, res: Response) => {
     try {
@@ -70,30 +43,6 @@ export const getPaginatedCustomerVolumeUsages = async (req: Request, res: Respon
         });
     }
 };
-
-
-// export const getPaginatedCustomerVolumeUsages = async (req: Request, res: Response) => {
-//     try {
-//         const start = parseInt(req.query.start as string) || 0;
-//         const limit = parseInt(req.query.limit as string) || 10;
-
-//         const usages = await getCustomerVolumeUsagesPaginated(start, limit);
-
-//         res.status(200).json({
-//             success: true,
-//             data: usages,
-//             start,
-//             limit,
-//             total: usages.length
-//         });
-//     } catch (error) {
-//         res.status(500).json({
-//             success: false,
-//             message: "Server error",
-//             error
-//         });
-//     }
-// };
 
 
 export const createCustomerVolumeUsage = async (req: Request, res: Response) => {
