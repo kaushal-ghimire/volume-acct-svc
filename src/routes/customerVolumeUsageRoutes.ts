@@ -1,14 +1,130 @@
-import { Router } from "express";
-import { getCustomerVolumeUsages, createCustomerVolumeUsage, updateDurMin } from "../controllers/customerVolumeUsageController";
+import { Router, Request, Response, NextFunction } from "express";
+import { getCustomerVolumeUsages, createCustomerVolumeUsage, updateDurMin, getPaginatedCustomerVolumeUsages } from "../controllers/customerVolumeUsageController";
+import { body, query, validationResult, ValidationError } from "express-validator";
+import customerVolumeUsage from "../models/customerVolumeUsage";
 
 const router = Router();
 
 /* using api/volume-usages/rohit_home */
 // router.get("/volume-usages/:username", getCustomerVolumeUsages);
 
+
+/* GET /api/all-volume-usages?offset=0&limit=10 */
+router.get(
+    "/all-volume-usages",
+    [
+        query("start")
+            .optional()
+            .isInt({ min: 0 }).withMessage("offset must be a positive integer")
+            .toInt(),
+
+        query("limit")
+            .optional()
+            .isInt({ min: 1, max: 100 }).withMessage("limit must be between 1 and 100")
+            .toInt(),
+
+        (req: Request, res: Response, next: NextFunction) => {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() });
+            }
+            next();
+        },
+    ],
+    getPaginatedCustomerVolumeUsages
+);
+
 /* for api/volume-usages?username=rohit_home */
-router.get("/volume-usages", getCustomerVolumeUsages);
-router.post("/volume-usages", createCustomerVolumeUsage);
+router.get(
+    "/volume-usages",
+    [
+        query("username")
+            .notEmpty().withMessage("username is required")
+            .matches(/^[a-zA-Z_]+$/).withMessage("username must contain only letters and underscores")
+            .isLength({ min: 3, max: 50 }).withMessage("username must be between 3–50 characters"),
+        (req: Request, res: Response, next: NextFunction) => {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() });
+            }
+            next();
+        },
+    ],
+
+    getCustomerVolumeUsages
+);
+
+// router.post("/volume-usages", createCustomerVolumeUsage);
+router.post(
+    "/volume-usages",
+    [
+        // user_name validation
+        body("user_name")
+            .notEmpty().withMessage("user_name is required")
+            .matches(/^[a-zA-Z_]+$/).withMessage("username must contain only letters and underscores")
+            .isLength({ min: 3, max: 50 }).withMessage("user_name must be between 3–50 characters")
+            .custom(async (value) => {
+                const existingUser = await customerVolumeUsage.findOne({
+                    where: { user_name: value },
+                });
+                if (existingUser) throw new Error("user_name already exists");
+                return true;
+            }),
+
+        // remaining_volume validation
+        body("remaining_volume")
+            .notEmpty().withMessage("remaining_volume is required")
+            .isNumeric().withMessage("remaining_volume must be a number")
+            .custom((value) => {
+                if (value < 0) throw new Error("remaining_volume must be >= 0");
+                return true;
+            }),
+
+        // validation error handler
+        (req: Request, res: Response, next: NextFunction) => {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+            next();
+        },
+    ],
+);
+
+// router.post(
+//     "/volume-usages",
+//     [
+//         body("user_name")
+//             .notEmpty().withMessage("user_name is required")
+//             .isString().withMessage("user_name must be a string")
+//             .isLength({ min: 3, max: 50 }).withMessage("user_name must be between 3–50 characters")
+//             .custom(async (value) => {
+//                 const existingUser = await customerVolumeUsage.findOne({
+//                     where: { user_name: value },
+//                 });
+//                 if (existingUser) {
+//                     throw new Error("user_name already exists");
+//                 }
+//                 return true;
+//             }),
+
+//         body("remaining_volume")
+//             .notEmpty().withMessage("remaining_volume is required")
+//             .isNumeric().withMessage("remaining_volume must be a number")
+//             .custom(value => {
+//                 if (value < 0) throw new Error("remaining_volume must be >= 0");
+//                 return true;
+//             }),
+
+//         (req: Request, res: Response, next: NextFunction) => {
+//             const errors = validationResult(req);
+//             if (!errors.isEmpty()) {
+//                 return res.status(400).json({ errors: errors.array() });
+//             }
+//             next();
+//         },
+//     ],
+//     createCustomerVolumeUsage
+// );
+
 router.patch("/volume-duration-remaining", updateDurMin);
 
 export default router;

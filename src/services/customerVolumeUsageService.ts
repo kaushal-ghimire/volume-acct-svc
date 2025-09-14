@@ -1,6 +1,7 @@
 import customerVolumeUsage from "../models/customerVolumeUsage";
 import { QueryTypes } from "sequelize";
 import oracleSequelize from "../config/database/oracleSequelize";
+import pgSequelize from "../config/database/pgSequelize";
 
 export const createUsage = async ({
     user_name,
@@ -43,6 +44,138 @@ export const getAllUsage = async (username?: string) => {
 
     return usages.map((usage) => usage.toJSON());
 };
+
+export const getCustomerVolumeUsagesPaginated = async (
+    offset: number = 0,
+    limit: number = 10,
+    dialect: "oracle" | "postgres" = "oracle"
+) => {
+    let sql: string;
+    let countSql: string;
+
+    if (dialect === "oracle") {
+        // Oracle pagination
+        sql = `
+      SELECT *
+      FROM (
+        SELECT cvu.*, ROWNUM AS rn
+        FROM (
+          SELECT *
+          FROM CUSTOMER_VOLUME_USAGE
+          ORDER BY id
+        ) cvu
+        WHERE ROWNUM <= :endRow
+      )
+      WHERE rn > :offset
+    `;
+
+        countSql = `SELECT COUNT(*) AS total FROM CUSTOMER_VOLUME_USAGE`;
+    } else {
+        // Postgres pagination
+        sql = `
+      SELECT *
+      FROM CUSTOMER_VOLUME_USAGE
+      ORDER BY id
+      OFFSET :offset
+      LIMIT :limit
+    `;
+
+        countSql = `SELECT COUNT(*) AS total FROM CUSTOMER_VOLUME_USAGE`;
+    }
+
+    const sequelize = dialect === "oracle" ? oracleSequelize : pgSequelize;
+
+    // Main paginated query
+    const data = await sequelize.query(sql, {
+        type: QueryTypes.SELECT,
+        replacements: {
+            offset,
+            limit,
+            endRow: offset + limit, // Oracle needs this
+        },
+    });
+
+    // Total count query
+    const countResult = await sequelize.query(countSql, {
+        type: QueryTypes.SELECT,
+    });
+    const total =
+        dialect === "oracle"
+            ? (countResult[0] as any).TOTAL
+            : (countResult[0] as any).total;
+
+    return {
+        data,
+        total,
+    };
+};
+
+
+// export const getCustomerVolumeUsagesPaginated = async (
+//     offset: number = 0,
+//     limit: number = 10,
+//     dialect: "oracle" | "postgres" = "oracle"
+// ) => {
+//     let sql: string;
+
+//     if (dialect === "oracle") {
+//         sql = `
+//       SELECT *
+//       FROM (
+//         SELECT cvu.*, ROWNUM AS rn
+//         FROM (
+//           SELECT *
+//           FROM CUSTOMER_VOLUME_USAGE
+//           ORDER BY id
+//         ) cvu
+//         WHERE ROWNUM <= :offset + :limit
+//       )
+//       WHERE rn > :offset
+//     `;
+//     } else {
+//         sql = `
+//       SELECT *
+//       FROM CUSTOMER_VOLUME_USAGE
+//       ORDER BY id
+//       OFFSET :offset
+//       LIMIT :limit
+//     `;
+//     }
+
+//     const sequelize = dialect === "oracle" ? oracleSequelize : pgSequelize;
+
+//     return await sequelize.query(sql, {
+//         type: QueryTypes.SELECT,
+//         replacements: { offset, limit }
+//     });
+// };
+
+
+// export const getCustomerVolumeUsagesPaginated = async (
+//     offset: number = 0,
+//     limit: number = 10
+// ): Promise<customerVolumeUsage[]> => {
+//     const sql = `
+//     SELECT *
+//     FROM (
+//       SELECT cvu.*, ROWNUM AS rn
+//       FROM (
+//         SELECT *
+//         FROM CUSTOMER_VOLUME_USAGE
+//         ORDER BY id
+//       ) cvu
+//       WHERE ROWNUM <= :offset + :limit
+//     )
+//     WHERE rn > :offset
+//   `;
+
+//     const usages = await oracleSequelize.query(sql, {
+//         type: QueryTypes.SELECT,
+//         replacements: { offset, limit },
+//     });
+
+//     return usages as customerVolumeUsage[];
+// };
 
 // export const getAllUsage = async () => {
 //     const usages = await customerVolumeUsage.findAll({

@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
-import { getAllUsage, createUsage } from "../services/customerVolumeUsageService";
+import { getAllUsage, createUsage, getCustomerVolumeUsagesPaginated } from "../services/customerVolumeUsageService";
 import { updateDurMinLeft } from "../services/updateDurationLeftService";
+import customerVolumeUsage from "../models/customerVolumeUsage";
+import oracleSequelize from "../config/database/oracleSequelize";
+import { QueryTypes } from "sequelize";
 
 
 /* without filter */
@@ -43,6 +46,54 @@ export const getCustomerVolumeUsages = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Error fetching customer volume usage', error: error.message });
     }
 };
+
+export const getPaginatedCustomerVolumeUsages = async (req: Request, res: Response) => {
+    try {
+        const start = parseInt(req.query.start as string) || 0;
+        const limit = parseInt(req.query.limit as string) || 10;
+
+        // getCustomerVolumeUsagesPaginated returns { data, total }
+        const { data, total } = await getCustomerVolumeUsagesPaginated(start, limit);
+
+        res.status(200).json({
+            success: true,
+            data,
+            start,
+            limit,
+            total, // ✅ correct total row count
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Server error",
+            error,
+        });
+    }
+};
+
+
+// export const getPaginatedCustomerVolumeUsages = async (req: Request, res: Response) => {
+//     try {
+//         const start = parseInt(req.query.start as string) || 0;
+//         const limit = parseInt(req.query.limit as string) || 10;
+
+//         const usages = await getCustomerVolumeUsagesPaginated(start, limit);
+
+//         res.status(200).json({
+//             success: true,
+//             data: usages,
+//             start,
+//             limit,
+//             total: usages.length
+//         });
+//     } catch (error) {
+//         res.status(500).json({
+//             success: false,
+//             message: "Server error",
+//             error
+//         });
+//     }
+// };
 
 
 export const createCustomerVolumeUsage = async (req: Request, res: Response) => {

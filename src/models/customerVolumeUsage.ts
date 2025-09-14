@@ -13,6 +13,7 @@ customerVolumeUsage.init(
     user_name: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
     remaining_volume: {
       type: DataTypes.BIGINT,
@@ -28,10 +29,10 @@ customerVolumeUsage.init(
     },
   },
   {
-    sequelize: pgSequelize,
+    sequelize: oracleSequelize,
     modelName: "customerVolumeUsage",
     tableName: "customer_volume_usage",
-    schema: "public",
+    schema: "ebill",
     timestamps: false,
   }
 );
