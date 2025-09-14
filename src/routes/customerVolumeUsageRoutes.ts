@@ -101,6 +101,7 @@ router.post(
             next();
         }
     ],
+    createCustomerVolumeUsage
 );
 
 router.patch("/volume-duration-remaining", updateDurMin);
