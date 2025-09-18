@@ -30,7 +30,7 @@ export const createUsage = async ({
     return newUsage.toJSON();
 };
 
-export const getAllUsage = async (username?: string) => {
+export const getAllUsage = async (username?: string, orderBy?: string, order?: "asc" | "desc") => {
     const where: any = {};
 
     if (username) {
@@ -39,11 +39,27 @@ export const getAllUsage = async (username?: string) => {
 
     const usages = await customerVolumeUsage.findAll({
         where,
-        order: [["id", "DESC"]],
+        order: orderBy ? [[orderBy, order?.toUpperCase() || "ASC"]] : [["id", "DESC"]],
     });
 
     return usages.map((usage) => usage.toJSON());
 };
+
+
+// export const getAllUsage = async (username?: string) => {
+//     const where: any = {};
+
+//     if (username) {
+//         where.user_name = username;
+//     }
+
+//     const usages = await customerVolumeUsage.findAll({
+//         where,
+//         order: [["id", "DESC"]],
+//     });
+
+//     return usages.map((usage) => usage.toJSON());
+// };
 
 export const getCustomerVolumeUsagesPaginated = async (
     offset: number = 0,

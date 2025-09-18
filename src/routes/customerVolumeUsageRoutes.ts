@@ -5,13 +5,10 @@ import customerVolumeUsage from "../models/customerVolumeUsage";
 
 const router = Router();
 
-/* using api/volume-usages/rohit_home */
-// router.get("/volume-usages/:username", getCustomerVolumeUsages);
-
 
 /* GET /api/all-volume-usages?offset=0&limit=10 */
 router.get(
-    "/all-volume-usages",
+    "/volume-usages-paginated",
     [
         query("start")
             .optional()
@@ -24,6 +21,46 @@ router.get(
             .toInt(),
 
         (req: Request, res: Response, next: NextFunction) => {
+            // const errors = validationResult(req);
+            // if (!errors.isEmpty()) {
+            //     return res.status(400).json({ errors: errors.array() });
+            // }
+
+            const errors = validationResult(req).array({ onlyFirstError: true });
+            if (errors.length > 0) {
+                return res.status(400).json({
+                    success: false,
+                    errors: errors.map(err => ({
+                        field: (err as any).param ?? (err as any).path ?? "unknown",
+                        message: err.msg
+                    }))
+                });
+            }
+            next();
+        },
+    ],
+    getPaginatedCustomerVolumeUsages
+);
+
+/* get all volumes usages with orderBY & order*/
+const ALLOWED_FIELDS = ["id", "user_name", "remaining_volume", "created_at", "updated_at"];
+router.get(
+    "/all-volume-usages",
+    [
+        query("orderBy")
+            .optional()
+            .isString().withMessage("orderBy must be a string")
+            .isIn(ALLOWED_FIELDS)
+            .withMessage(`orderBy must be one of: ${ALLOWED_FIELDS.join(", ")}`),
+
+        query("order")
+            .optional()
+            .isString().withMessage("order must be a string")
+            .toLowerCase()
+            .isIn(["asc", "desc"])
+            .withMessage("order must be 'asc' or 'desc'"),
+
+        (req: Request, res: Response, next: NextFunction) => {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 return res.status(400).json({ errors: errors.array() });
@@ -31,7 +68,7 @@ router.get(
             next();
         },
     ],
-    getPaginatedCustomerVolumeUsages
+    getCustomerVolumeUsages
 );
 
 /* for api/volume-usages?username=rohit_home */
@@ -40,12 +77,22 @@ router.get(
     [
         query("username")
             .notEmpty().withMessage("username is required")
-            .matches(/^[a-zA-Z_]+$/).withMessage("username must contain only letters and underscores")
-            .isLength({ min: 3, max: 50 }).withMessage("username must be between 3–50 characters"),
+            .isLength({ min: 1, max: 22 }).withMessage("username must be between 1–22 characters"),
         (req: Request, res: Response, next: NextFunction) => {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(400).json({ errors: errors.array() });
+            // const errors = validationResult(req);
+            // if (!errors.isEmpty()) {
+            //     return res.status(400).json({ errors: errors.array() });
+            // }
+
+            const errors = validationResult(req).array({ onlyFirstError: true });
+            if (errors.length > 0) {
+                return res.status(400).json({
+                    success: false,
+                    errors: errors.map(err => ({
+                        field: (err as any).param ?? (err as any).path ?? "unknown",
+                        message: err.msg
+                    }))
+                });
             }
             next();
         },
@@ -61,8 +108,7 @@ router.post(
         // user_name validation
         body("user_name")
             .notEmpty().withMessage("user_name is required")
-            .matches(/^[a-zA-Z_]+$/).withMessage("username must contain only letters and underscores")
-            .isLength({ min: 3, max: 50 }).withMessage("user_name must be between 3–50 characters")
+            .isLength({ min: 1, max: 22 }).withMessage("user_name must be between 1–22 characters")
             .custom(async (value) => {
                 const existingUser = await customerVolumeUsage.findOne({
                     where: { user_name: value },

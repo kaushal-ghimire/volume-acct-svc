@@ -6,19 +6,37 @@ import oracleSequelize from "../config/database/oracleSequelize";
 import { QueryTypes } from "sequelize";
 
 
-/* using api/volume-usages?username=kaushal_home */
+/* using api/volume-usages?username=kaushal_home and also with orderBy validation */
 export const getCustomerVolumeUsages = async (req: Request, res: Response) => {
     try {
-        const { username } = req.query;
+        const { username, orderBy, order } = req.query;
 
-        const usages = await getAllUsage(username as string | undefined);
+        const usages = await getAllUsage(
+            username as string | undefined,
+            orderBy as string | undefined,
+            order as "asc" | "desc" | undefined
+        );
 
         res.json(usages);
-    } catch (error: any) {
-        console.error("Error fetching customer volume usage:", error.message, error.stack);
-        res.status(500).json({ message: 'Error fetching customer volume usage', error: error.message });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 };
+
+/* all-volume-usage API without orderBy validation */
+// export const getCustomerVolumeUsages = async (req: Request, res: Response) => {
+//     try {
+//         const { username } = req.query;
+
+//         const usages = await getAllUsage(username as string | undefined);
+
+//         res.json(usages);
+//     } catch (error: any) {
+//         console.error("Error fetching customer volume usage:", error.message, error.stack);
+//         res.status(500).json({ message: 'Error fetching customer volume usage', error: error.message });
+//     }
+// };
 
 export const getPaginatedCustomerVolumeUsages = async (req: Request, res: Response) => {
     try {
