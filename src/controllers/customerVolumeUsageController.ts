@@ -51,7 +51,7 @@ export const getPaginatedCustomerVolumeUsages = async (req: Request, res: Respon
             data,
             start,
             limit,
-            total, // ✅ correct total row count
+            total, // correct total row count
         });
     } catch (error) {
         res.status(500).json({
@@ -91,7 +91,7 @@ export const updateDurMin = async (req: Request, res: Response) => {
 
         if (!username || newDurMinLeft === undefined) {
             return res.status(400).json({
-                error: "username (query param) and newDurMinLeft (body) are required"
+                error: "userName and newDurMinLeft are required"
             });
         }
 
