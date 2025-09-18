@@ -84,6 +84,30 @@ router.post(
     createCustomerVolumeUsage
 );
 
-router.patch("/volume-duration-remaining", updateDurMin);
+router.patch("/volume-duration-remaining",
+    query("username")
+        .notEmpty().withMessage("username param is required")
+        .isLength({ min: 2 }).withMessage("username must be at least 2 characters long"),
+
+    body("newDurMinLeft")
+        .notEmpty().withMessage("newDurMinLeft is required")
+        .isNumeric().withMessage("newDurMinLeft must be a number"),
+
+    // Check validation results
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req).array({ onlyFirstError: true }); // optional, to simplify
+
+        if (errors.length > 0) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.map(err => ({
+                    field: (err as any).param ?? (err as any).path ?? "unknown",
+                    message: err.msg
+                }))
+            });
+        }
+        next();
+    }
+    , updateDurMin);
 
 export default router;
