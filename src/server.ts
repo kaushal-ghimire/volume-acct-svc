@@ -1,5 +1,7 @@
 import dotenv from "dotenv";
 import app from "./app";
+import { appConfig } from "./config/appConfig";
+
 // import { updateRemainingVolume } from "./services/updateRemainingVolume";
 // import { migrate } from "./config/database/migrate";
 
@@ -13,7 +15,7 @@ const startServer = async () => {
     // updateRemainingVolume();
 
     app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`);
+        console.log(`Server running on ${appConfig.url}:${appConfig.port}`);
     });
 };
 

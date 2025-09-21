@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
-import config from '../config/config';
+import { appConfig } from '../config/appConfig';
+
 
 const router = Router();
 
@@ -10,7 +11,7 @@ router.get('/', (req: Request, res: Response) => {
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>${config.appName}</title>
+        <title>${appConfig.name}</title>
         <style>
             body, html {
                 height: 100%;
@@ -55,7 +56,7 @@ router.get('/', (req: Request, res: Response) => {
     </head>
     <body>
         <div class="card">
-            <h1>${config.appName}</h1>
+            <h1>${appConfig.name}</h1>
             <footer>
                 Node.js ${process.version} | Express v${require('express/package.json').version}
             </footer>
