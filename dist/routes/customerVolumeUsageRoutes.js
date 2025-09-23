@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const customerVolumeUsageController_1 = require("../controllers/customerVolumeUsageController");
+const router = (0, express_1.Router)();
+router.get("/get-customer-usage", customerVolumeUsageController_1.getCustomerVolumeUsages);
+router.post("/create-customer-usage", customerVolumeUsageController_1.createCustomerVolumeUsage);
+exports.default = router;
+// import express from 'express';
+// import { getCustomerVolumeUsages, createCustomerVolumeUsage } from '../controllers/customerVolumeUsageController';
+// const router = express.Router();
+// router.get('/getAllUsageVolume', getCustomerVolumeUsages);
+// router.post('/createVolumeUsage', createCustomerVolumeUsage);
+// export default router;
