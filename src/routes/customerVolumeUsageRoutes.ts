@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { getCustomerVolumeUsages, createCustomerVolumeUsage, updateDurMin, getPaginatedCustomerVolumeUsages } from "../controllers/customerVolumeUsageController";
+import { getCustomerVolumeUsages, createCustomerVolumeUsage, updateDurMin, VolumeUsagesInOrder } from "../controllers/customerVolumeUsageController";
 import { body, query, validationResult, ValidationError } from "express-validator";
 import customerVolumeUsage from "../models/customerVolumeUsage";
 
@@ -13,10 +13,6 @@ router.get(
             .notEmpty().withMessage("username is required")
             .isLength({ min: 1, max: 22 }).withMessage("username must be between 1–22 characters"),
         (req: Request, res: Response, next: NextFunction) => {
-            // const errors = validationResult(req);
-            // if (!errors.isEmpty()) {
-            //     return res.status(400).json({ errors: errors.array() });
-            // }
 
             const errors = validationResult(req).array({ onlyFirstError: true });
             if (errors.length > 0) {
@@ -33,6 +29,38 @@ router.get(
     ],
 
     getCustomerVolumeUsages
+);
+
+/*order by validation to get all volume usage */
+router.get(
+    "/volume-usages-order",
+    [
+        query("orderBy")
+            .optional()
+            .isIn(["id", "name", "email", "createdAt", "updatedAt"])
+            .withMessage("Invalid orderBy field"),
+
+        query("order")
+            .optional()
+            .isIn(["asc", "desc"])
+            .withMessage("Invalid order value, must be 'asc' or 'desc'"),
+
+        (req: Request, res: Response, next: NextFunction) => {
+            const errors = validationResult(req).array({ onlyFirstError: true });
+            if (errors.length > 0) {
+                return res.status(400).json({
+                    success: false,
+                    errors: errors.map(err => ({
+                        field: (err as any).param ?? (err as any).path ?? "unknown",
+                        message: err.msg,
+                    })),
+                });
+            }
+            next();
+        },
+    ],
+
+    VolumeUsagesInOrder
 );
 
 // router.post("/volume-usages", createCustomerVolumeUsage);
@@ -60,12 +88,6 @@ router.post(
                 return true;
             }),
 
-        // validation error handler
-        // (req: Request, res: Response, next: NextFunction) => {
-        //     const errors = validationResult(req);
-        //     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-        //     next();
-        // },
         (req: Request, res: Response, next: NextFunction) => {
             const errors = validationResult(req).array({ onlyFirstError: true }); // optional, to simplify
 

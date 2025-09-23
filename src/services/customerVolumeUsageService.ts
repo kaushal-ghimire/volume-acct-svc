@@ -45,6 +45,17 @@ export const getAllUsage = async (username?: string, orderBy?: string, order?: "
     return usages.map((usage) => usage.toJSON());
 };
 
+export const getAllUsageOrder = async (orderBy?: string, order?: "asc" | "desc") => {
+    const where: any = {};
+
+    const usages = await customerVolumeUsage.findAll({
+        where,
+        order: orderBy ? [[orderBy, order?.toUpperCase() || "ASC"]] : [["id", "DESC"]],
+    });
+
+    return usages.map((usage) => usage.toJSON());
+};
+
 
 // export const getAllUsage = async (username?: string) => {
 //     const where: any = {};
@@ -60,68 +71,3 @@ export const getAllUsage = async (username?: string, orderBy?: string, order?: "
 
 //     return usages.map((usage) => usage.toJSON());
 // };
-
-export const getCustomerVolumeUsagesPaginated = async (
-    offset: number = 0,
-    limit: number = 10,
-    dialect: "oracle" | "postgres" = "oracle"
-) => {
-    let sql: string;
-    let countSql: string;
-
-    if (dialect === "oracle") {
-        // Oracle pagination
-        sql = `
-      SELECT *
-      FROM (
-        SELECT cvu.*, ROWNUM AS rn
-        FROM (
-          SELECT *
-          FROM CUSTOMER_VOLUME_USAGE
-          ORDER BY id
-        ) cvu
-        WHERE ROWNUM <= :endRow
-      )
-      WHERE rn > :offset
-    `;
-
-        countSql = `SELECT COUNT(*) AS total FROM CUSTOMER_VOLUME_USAGE`;
-    } else {
-        // Postgres pagination
-        sql = `
-      SELECT *
-      FROM CUSTOMER_VOLUME_USAGE
-      ORDER BY id
-      OFFSET :offset
-      LIMIT :limit
-    `;
-
-        countSql = `SELECT COUNT(*) AS total FROM CUSTOMER_VOLUME_USAGE`;
-    }
-
-    const sequelize = dialect === "oracle" ? oracleSequelize : pgSequelize;
-
-    // Main paginated query
-    const data = await sequelize.query(sql, {
-        type: QueryTypes.SELECT,
-        replacements: {
-            offset,
-            limit,
-            endRow: offset + limit, // Oracle needs this
-        },
-    });
-
-    // Total count query
-    const countResult = await sequelize.query(countSql, {
-        type: QueryTypes.SELECT,
-    });
-    const total =
-        dialect === "oracle"
-            ? (countResult[0] as any).TOTAL
-            : (countResult[0] as any).total;
-
-    return {
-        data,
-        total,
-    };
-};
