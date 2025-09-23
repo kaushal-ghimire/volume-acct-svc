@@ -1,4 +1,4 @@
-import express from "express";
+import express, { type Request, type Response } from "express";
 import customerVolumeUsageRoutes from "./routes/customerVolumeUsageRoutes";
 import rootRoutes from "./routes/rootRoutes";
 
@@ -14,8 +14,8 @@ app.use('/', rootRoutes);
 // API routes
 app.use('/api', customerVolumeUsageRoutes);
 
-// Catch-all 404
-app.use((_req, res) => {
+// Catch-all route for handling 404 errors
+app.use((_req: Request, res: Response) => {
     res.status(404).json({ message: 'Route not found' });
 });
 
