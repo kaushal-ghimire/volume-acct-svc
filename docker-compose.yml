@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  volume-accounting:
+    container_name: volume-accounting
+    build: .
+    image: volume-accounting:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - TZ=Asia/Kathmandu
+      - NODE_ORACLEDB_THICK_MODE=true
+    networks:
+      - volume-accounting-network
+
+networks:
+  volume-accounting-network:
+    external: true

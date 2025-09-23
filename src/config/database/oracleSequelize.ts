@@ -4,7 +4,9 @@ import { Sequelize } from 'sequelize';
 
 let pool: oracledb.Pool;
 // Initialize Oracle Client for Thick mode
-oracledb.initOracleClient({ libDir: '/opt/oracle/instantclient/instantclient_23_9' });
+if (process.env.NODE_ORACLEDB_THICK_MODE === "true") {
+    oracledb.initOracleClient({ libDir: '/opt/oracle/instantclient_23_9' });
+}
 
 const oracleSequelize = new Sequelize(
     ebillDatabaseConfig.database.serviceName,

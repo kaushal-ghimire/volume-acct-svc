@@ -7,16 +7,16 @@ import { appConfig } from "./config/appConfig";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 3000;
-
 const startServer = async () => {
+    const port = appConfig.port;
     // await migrate();
 
     // updateRemainingVolume();
 
-    app.listen(PORT, () => {
-        console.log(`Server running on ${appConfig.url}:${appConfig.port}`);
+    app.listen(port, () => {
+        console.log(`Server is running at ${appConfig.url}:${port}`);
     });
+
 };
 
 startServer();
